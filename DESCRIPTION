@@ -18,7 +18,7 @@ Suggests: testthat (>= 3.0.0)
 Depends: R (>= 4.1.0)
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2025-12-21 16:37:18 UTC; at
+Packaged: 2025-12-21 17:09:07 UTC; at
 Author: Amal Tawfik [aut, cre, cph] (ORCID:
     <https://orcid.org/0009-0006-2422-1555>, ROR:
     <https://ror.org/04j47fz63>)
