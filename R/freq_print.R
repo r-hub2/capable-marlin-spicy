@@ -1,4 +1,4 @@
-#' Styled print method for `freq()` tables (spicy engine)
+#' Styled print method for `freq()` tables
 #'
 #' @description
 #' Internal print method used by [freq()] to display a styled, spicy-formatted
@@ -52,9 +52,9 @@
 #'   labels = c("Low" = 1, "Medium" = 2, "High" = 3)
 #' )
 #' var_label(x) <- "Satisfaction level"
-#' # Internal use (normally called automatically by freq())
+#' # Capture result without printing, then print explicitly
 #' df <- spicy::freq(x, styled = FALSE)
-#' print(df)
+#' print(df) # dispatches to print.spicy_freq_table()
 #'
 #' @seealso
 #' [freq()] for the main frequency table generator.
@@ -78,21 +78,25 @@ print.spicy_freq_table <- function(x, ...) {
   var_name_clean <- sub("^.*\\$", "", var_name)
   data_name_clean <- sub("\\$.*$", "", data_name)
 
-  valid_block <- df[!is.na(df$value) & df$value != "<NA>", , drop = FALSE]
-  missing_block <- df[is.na(df$value) | df$value == "<NA>", , drop = FALSE]
+  valid_block <- df[!is.na(df$value), , drop = FALSE]
+  missing_block <- df[is.na(df$value), , drop = FALSE]
 
   show_valid_col <- nrow(missing_block) > 0
 
   fmt_pct <- function(p) {
-    ifelse(is.na(p), "NA",
-      format(round(100 * p, digits),
-        nsmall = digits, trim = TRUE
-      )
+    ifelse(
+      is.na(p),
+      "NA",
+      format(round(100 * p, digits), nsmall = digits, trim = TRUE)
     )
   }
 
   fmt_int <- function(v) {
-    format(round(v, ifelse(any(v %% 1 != 0), 2, 0)), trim = TRUE)
+    ifelse(
+      v %% 1 != 0,
+      format(round(v, 2), trim = TRUE),
+      format(round(v, 0), trim = TRUE)
+    )
   }
 
   build_rows <- function(block, category, show_valid_col_block) {
@@ -101,7 +105,7 @@ print.spicy_freq_table <- function(x, ...) {
     }
     out <- data.frame(
       Category = c(category, rep("", nrow(block) - 1L)),
-      Values = ifelse(is.na(block$value) | block$value == "<NA>", "NA", block$value),
+      Values = ifelse(is.na(block$value), "NA", block$value),
       `Freq.` = fmt_int(block$n),
       Percent = fmt_pct(block$prop),
       stringsAsFactors = FALSE,
@@ -134,27 +138,48 @@ print.spicy_freq_table <- function(x, ...) {
   )
 
   if (show_valid_col) {
-    total_row$`Valid Percent` <- format(round(100, digits), nsmall = digits, trim = TRUE)
+    total_row$`Valid Percent` <- format(
+      round(100, digits),
+      nsmall = digits,
+      trim = TRUE
+    )
   }
 
   if (has_cum) {
-    total_row$`Cum. Percent` <- format(round(100, digits), nsmall = digits, trim = TRUE)
+    total_row$`Cum. Percent` <- format(
+      round(100, digits),
+      nsmall = digits,
+      trim = TRUE
+    )
     if (show_valid_col) {
-      total_row$`Cum. Valid Percent` <- format(round(100, digits), nsmall = digits, trim = TRUE)
+      total_row$`Cum. Valid Percent` <- format(
+        round(100, digits),
+        nsmall = digits,
+        trim = TRUE
+      )
     }
   }
 
-  all_cols <- unique(c(names(rows_valid), names(rows_missing), names(total_row)))
+  all_cols <- unique(c(
+    names(rows_valid),
+    names(rows_missing),
+    names(total_row)
+  ))
   fix_cols <- function(df_part) {
     if (is.null(df_part)) {
       return(NULL)
     }
     missing <- setdiff(all_cols, names(df_part))
-    for (m in missing) df_part[[m]] <- ""
+    for (m in missing) {
+      df_part[[m]] <- ""
+    }
     df_part[all_cols]
   }
 
-  disp <- do.call(rbind, lapply(list(rows_valid, rows_missing, total_row), fix_cols))
+  disp <- do.call(
+    rbind,
+    lapply(list(rows_valid, rows_missing, total_row), fix_cols)
+  )
 
   footer_lines <- c()
 

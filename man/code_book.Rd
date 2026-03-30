@@ -47,21 +47,16 @@ client-side export to various formats.
 }
 \section{Dependencies}{
 
-Requires the following packages:
+Requires the following package:
 \itemize{
 \item \strong{DT}
-\item \strong{cli}
-\item \strong{tools}
 }
 }
 
 \examples{
 \dontrun{
-# Example with a built-in dataset
-df <- head(mtcars)
-
 # Launch the interactive codebook (opens in Viewer)
-code_book(df)
+code_book(sochealth)
 }
 
 }

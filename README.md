@@ -1,71 +1,76 @@
 
-# spicy <a href="https://amaltawfik.github.io/spicy/"><img src="man/figures/logo.png" align="left" height="139" alt="spicy website" /></a>
+# spicy: frequency tables, cross-tabulations, and summary tables in R <a href="https://amaltawfik.github.io/spicy/"><img src="man/figures/logo.png" align="left" height="139" alt="spicy website" /></a>
 
 <!-- badges: start -->
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version-ago/spicy)](https://CRAN.R-project.org/package=spicy)
-[![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/grand-total/spicy)](https://cranlogs.r-pkg.org/badges/grand-total/spicy)
-[![GitHub
-release](https://img.shields.io/github/v/release/amaltawfik/spicy?include_prereleases&label=GitHub%20release)](https://github.com/amaltawfik/spicy/releases)
+[![r-universe](https://amaltawfik.r-universe.dev/badges/spicy)](https://amaltawfik.r-universe.dev/spicy)
 [![R-CMD-check](https://github.com/amaltawfik/spicy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/amaltawfik/spicy/actions/workflows/R-CMD-check.yaml)
 [![R-hub](https://github.com/amaltawfik/spicy/actions/workflows/rhub.yaml/badge.svg)](https://github.com/amaltawfik/spicy/actions/workflows/rhub.yaml)
-[![Project Status: Active - The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Codecov](https://codecov.io/gh/amaltawfik/spicy/branch/main/graph/badge.svg)](https://app.codecov.io/gh/amaltawfik/spicy)
+[![Project Status:
+Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![MIT
 License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/947229863.svg)](https://doi.org/10.5281/zenodo.15397865)
+[![DOI](https://img.shields.io/badge/DOI-10.32614%2FCRAN.package.spicy-blue)](https://doi.org/10.32614/CRAN.package.spicy)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/spicy)](https://cranlogs.r-pkg.org/badges/grand-total/spicy)
 <!-- badges: end -->
 
-spicy is designed to make variable exploration, documentation, and
-descriptive statistics fast, expressive, and easy to use.
+spicy is an R package for frequency tables, cross-tabulations,
+association measures, summary tables, and labelled survey data
+workflows.
 
 ## What is spicy?
 
-spicy is an R package for quick, consistent, and elegant exploration of
-data frames. It helps you:
+spicy helps you explore categorical and labelled data in R with
+readable, console-first outputs. It is designed for survey research,
+descriptive statistics, and reporting workflows, with tools for
+frequency tables, cross-tabulations with chi-squared tests and effect
+sizes, categorical and continuous summary tables, variable inspection,
+and codebooks.
 
-- Extract variable metadata and display compact summaries of dataset
-  variables using `varlist()` (with `vl()` as a convenient shortcut),
-  including names, labels, values, classes, number of distinct
-  non-missing values, number of valid observations, number of missing
-  observations. Similar to the “Variable View” in SPSS or the “Variables
-  Manager” in Stata.
-- Generate an interactive codebook generator `code_book()` that extends
-  `varlist()` with searchable summaries and built-in export options
-  (Copy, CSV, Excel, PDF, Print) via `DT::datatable`. Ideal for
-  documenting all the variables present in a data frame.
-- Compute frequency tables with `freq()`, row-wise means with
-  `mean_n()`, row-wise sums with `sum_n()`, and counts of specific
-  values using `count_n()` — all with automatic handling of missing
-  data.
-- Explore relationships between categorical variables using
-  `cross_tab()` for contingency tables and `cramer_v()` for association
-  strength.
-- Copy data frames or result tables directly to the clipboard using
-  `copy_clipboard()` for fast export to spreadsheets or text editors.
-- Extract and assign variable labels from column headers with
-  `label_from_names()`, especially useful for LimeSurvey CSV exports
-  where headers follow a “name \[separator\] label” pattern — any string
-  can be used as the separator (e.g., “.”, ” - “,”:“, etc.).
-- Handle `labelled`, `factor`, `Date`, `POSIXct`, and other commonly
-  used variable types.
+With spicy, you can:
 
-All with intuitive functions that return clean, structured outputs.
+- **Inspect variables** with `varlist()` and `vl()` for names, labels,
+  values, classes, and missing data.
+- **Create frequency tables in R** with `freq()`.
+- **Create cross-tabulations in R** with `cross_tab()`, including
+  percentages, chi-squared tests, and effect sizes.
+- **Measure associations** with `cramer_v()`, `phi()`, `gamma_gk()`,
+  `kendall_tau_b()`, `somers_d()`, and related functions.
+- **Build categorical summary tables in R** with `table_categorical()`
+  for gt, tinytable, flextable, Excel, Word, or clipboard export.
+- **Build continuous summary tables in R** with `table_continuous()` for
+  console, gt, tinytable, flextable, Excel, Word, or clipboard output.
+- **Generate codebooks** with `code_book()` for labelled and
+  survey-style datasets.
+- **Extract variable labels** with `label_from_names()`, including
+  LimeSurvey-style headers.
 
-------------------------------------------------------------------------
+Works with `labelled`, `factor`, `ordered`, `Date`, `POSIXct`, and other
+common variable types. For a full introduction, see [Getting started
+with spicy](https://amaltawfik.github.io/spicy/articles/spicy.html).
 
 ## Installation
 
-For the stable version, install from CRAN.
+Install the current CRAN release:
 
 ``` r
 install.packages("spicy")
 ```
 
-You can install the development version of spicy from GitHub with:
+Install the latest build from
+[r-universe](https://amaltawfik.r-universe.dev/spicy):
+
+``` r
+install.packages("spicy", repos = c("https://amaltawfik.r-universe.dev", "https://cloud.r-project.org"))
+```
+
+This may be newer than the current CRAN release.
+
+Install the development version from GitHub with `pak`:
 
 ``` r
 # install.packages("pak")
@@ -74,270 +79,320 @@ pak::pak("amaltawfik/spicy")
 
 ------------------------------------------------------------------------
 
-## Example usage
+## Quick tour
 
-Here are some quick examples using built-in datasets:
+The examples below use the bundled `sochealth` dataset.
+
+### Inspect variables
+
+<img src="man/figures/animation_varlist.gif" alt="varlist demo with labelled data" width="100%">
 
 ``` r
-library(spicy)
-library(dplyr)
-
-# Get a summary of all variables in the Viewer
-varlist(iris)
+varlist(sochealth, tbl = TRUE)
+#> # A tibble: 24 × 7
+#>    Variable          Label                 Values Class N_distinct N_valid   NAs
+#>    <chr>             <chr>                 <chr>  <chr>      <int>   <int> <int>
+#>  1 sex               Sex                   Femal… fact…          2    1200     0
+#>  2 age               Age (years)           25, 2… nume…         51    1200     0
+#>  3 age_group         Age group             25-34… orde…          4    1200     0
+#>  4 education         Highest education le… Lower… orde…          3    1200     0
+#>  5 social_class      Subjective social cl… Lower… orde…          5    1200     0
+#>  6 region            Region of residence   Centr… fact…          6    1200     0
+#>  7 employment_status Employment status     Emplo… fact…          4    1200     0
+#>  8 income_group      Household income gro… Low, … orde…          4    1182    18
+#>  9 income            Monthly household in… 1000,… nume…       1052    1200     0
+#> 10 smoking           Current smoker        No, Y… fact…          2    1175    25
+#> # ℹ 14 more rows
 ```
 
-<img src="man/figures/varlist_1.png" alt="Summary of all variables shown in the Viewer">
+See [Explore variables and build codebooks in
+R](https://amaltawfik.github.io/spicy/articles/variable-exploration.html)
+for more on `varlist()`, `vl()`, and `code_book()`.
+
+### Frequency tables and cross-tabulations
 
 ``` r
-# Get a summary of the variables that start with "d" in the Viewer
-# Asterisks (*) in the title indicate that the data frame has been subsetted
-vl(mtcars, starts_with("d"))
+freq(sochealth, income_group)
+#> Frequency table: income_group
+#> 
+#>  Category │ Values        Freq.  Percent  Valid Percent 
+#> ──────────┼─────────────────────────────────────────────
+#>  Valid    │ Low             247     20.6           20.9 
+#>           │ Lower middle    388     32.3           32.8 
+#>           │ Upper middle    328     27.3           27.7 
+#>           │ High            219     18.2           18.5 
+#>  Missing  │ NA               18      1.5                
+#> ──────────┼─────────────────────────────────────────────
+#>  Total    │                1200    100.0          100.0 
+#> 
+#> Label: Household income group
+#> Class: ordered, factor
+#> Data: sochealth
+
+cross_tab(sochealth, smoking, education, percent = "col")
+#> Crosstable: smoking x education (Column %)
+#> 
+#>  Values      │      Lower secondary       Upper secondary       Tertiary 
+#> ─────────────┼───────────────────────────────────────────────────────────
+#>  No          │                 69.6                  78.7           84.9 
+#>  Yes         │                 30.4                  21.3           15.1 
+#> ─────────────┼───────────────────────────────────────────────────────────
+#>  Total       │                100.0                 100.0          100.0 
+#>  N           │                  257                   527            391 
+#> 
+#>  Values      │      Total 
+#> ─────────────┼────────────
+#>  No          │       78.8 
+#>  Yes         │       21.2 
+#> ─────────────┼────────────
+#>  Total       │      100.0 
+#>  N           │       1175 
+#> 
+#> Chi-2(2) = 21.6, p < 0.001
+#> Cramer's V = 0.14
 ```
 
-<img src="man/figures/varlist_2.png" alt="Summary of the variables that start with d in the Viewer">
+See [Frequency tables and cross-tabulations in
+R](https://amaltawfik.github.io/spicy/articles/frequency-tables.html)
+for `freq()`, `cross_tab()`, percentages, weights, and tests.
+
+### Association measures
 
 ``` r
-# Get a summary of all variables as a tibble
-varlist(iris, tbl = TRUE)
-#> # A tibble: 5 × 7
-#>   Variable     Label Values                       Class N_distinct N_valid   NAs
-#>   <chr>        <chr> <chr>                        <chr>      <int>   <int> <int>
-#> 1 Sepal.Length <NA>  4.3, 4.4, 4.5, ..., 7.9      nume…         35     150     0
-#> 2 Sepal.Width  <NA>  2, 2.2, 2.3, ..., 4.4        nume…         23     150     0
-#> 3 Petal.Length <NA>  1, 1.1, 1.2, ..., 6.9        nume…         43     150     0
-#> 4 Petal.Width  <NA>  0.1, 0.2, 0.3, ..., 2.5      nume…         22     150     0
-#> 5 Species      <NA>  setosa, versicolor, virgini… fact…          3     150     0
+tbl <- xtabs(~ self_rated_health + education, data = sochealth)
 
-# Tabulate frequencies with sort alphabetically (Z-A)
-freq(iris, Species, sort = "name-")
-#> Frequency table: Species
-#> 
-#>  Category │ Values      Freq.  Percent 
-#> ──────────┼────────────────────────────
-#>  Valid    │ virginica      50     33.3 
-#>           │ versicolor     50     33.3 
-#>           │ setosa         50     33.3 
-#> ──────────┼────────────────────────────
-#>  Total    │               150    100.0 
-#> 
-#> Class: factor
-#> Data: iris
+# Quick scalar estimate
+cramer_v(tbl)
+#> [1] 0.1761697
 
-# Cross-tab with frequencies
-cross_tab(mtcars, cyl, gear)
-#> Crosstable: cyl x gear (N)
-#> 
-#>  Values      │       3        4       5 │      Total 
-#> ─────────────┼──────────────────────────┼────────────
-#>  4           │       1        8       2 │         11 
-#>  6           │       2        4       1 │          7 
-#>  8           │      12        0       2 │         14 
-#> ─────────────┼──────────────────────────┼────────────
-#>  Total       │      15       12       5 │         32 
-#> 
-#> Chi-2: 18.0 (df = 4), p = 0.001
-#> Cramer's V: 0.53
-#> Warning: 6 expected cells < 5 (66.7%). Minimum expected = 1.09. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
+# Detailed result with CI and p-value
+cramer_v(tbl, detail = TRUE)
+#> Estimate  CI lower  CI upper        p
+#>    0.176     0.120     0.231  < 0.001
+```
 
-# Cross-tab with column percentages
-cross_tab(mtcars, cyl, gear, percent = "column")
-#> Crosstable: cyl x gear (Column %)
-#> 
-#>  Values      │          3           4           5 │      Total 
-#> ─────────────┼────────────────────────────────────┼────────────
-#>  4           │        6.7        66.7        40.0 │       34.4 
-#>  6           │       13.3        33.3        20.0 │       21.9 
-#>  8           │       80.0         0.0        40.0 │       43.8 
-#> ─────────────┼────────────────────────────────────┼────────────
-#>  Total       │      100.0       100.0       100.0 │      100.0 
-#>  N           │         15          12           5 │         32 
-#> 
-#> Chi-2: 18.0 (df = 4), p = 0.001
-#> Cramer's V: 0.53
-#> Warning: 6 expected cells < 5 (66.7%). Minimum expected = 1.09. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
+See [Cramer’s V, Phi, and association measures in
+R](https://amaltawfik.github.io/spicy/articles/association-measures.html)
+for a guide on choosing the right measure.
 
-# Cross-tab with row percentages
-cross_tab(mtcars, cyl, gear, percent = "row")
-#> Crosstable: cyl x gear (Row %)
-#> 
-#>  Values      │         3          4          5 │      Total        N 
-#> ─────────────┼─────────────────────────────────┼─────────────────────
-#>  4           │       9.1       72.7       18.2 │      100.0       11 
-#>  6           │      28.6       57.1       14.3 │      100.0        7 
-#>  8           │      85.7        0.0       14.3 │      100.0       14 
-#> ─────────────┼─────────────────────────────────┼─────────────────────
-#>  Total       │      46.9       37.5       15.6 │      100.0       32 
-#> 
-#> Chi-2: 18.0 (df = 4), p = 0.001
-#> Cramer's V: 0.53
-#> Warning: 6 expected cells < 5 (66.7%). Minimum expected = 1.09. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
+### Summary tables
 
-# Cross-tab with grouped by a single variable
-cross_tab(mtcars, cyl, gear, by = am)
-#> Crosstable: cyl x gear (N) | am = 0
-#> 
-#>  Values      │       3       4       5 │      Total 
-#> ─────────────┼─────────────────────────┼────────────
-#>  4           │       1       2       0 │          3 
-#>  6           │       2       2       0 │          4 
-#>  8           │      12       0       0 │         12 
-#> ─────────────┼─────────────────────────┼────────────
-#>  Total       │      15       4       0 │         19 
-#> 
-#> Chi-2: NA (df = 4), p = NA
-#> Cramer's V: NA
-#> Warning: 8 expected cells < 5 (88.9%). 5 expected cells < 1. Minimum expected = 0. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
-#> 
-#> Crosstable: cyl x gear (N) | am = 1
-#> 
-#>  Values      │      3       4       5 │      Total 
-#> ─────────────┼────────────────────────┼────────────
-#>  4           │      0       6       2 │          8 
-#>  6           │      0       2       1 │          3 
-#>  8           │      0       0       2 │          2 
-#> ─────────────┼────────────────────────┼────────────
-#>  Total       │      0       8       5 │         13 
-#> 
-#> Chi-2: NA (df = 4), p = NA
-#> Cramer's V: NA
-#> Warning: 9 expected cells < 5 (100%). 4 expected cells < 1. Minimum expected = 0. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
-
-# Cross-tab with grouped by two variables
-cross_tab(mtcars, cyl, gear, by = interaction(vs, am))
-#> Crosstable: cyl x gear (N) | vs x am = 0.0
-#> 
-#>  Values      │       3       4       5 │      Total 
-#> ─────────────┼─────────────────────────┼────────────
-#>  4           │       0       0       0 │          0 
-#>  6           │       0       0       0 │          0 
-#>  8           │      12       0       0 │         12 
-#> ─────────────┼─────────────────────────┼────────────
-#>  Total       │      12       0       0 │         12 
-#> 
-#> Chi-2 and Cramer's V not computed: insufficient data (only one non-empty row/column).
-#> 
-#> Crosstable: cyl x gear (N) | vs x am = 1.0
-#> 
-#>  Values      │      3       4       5 │      Total 
-#> ─────────────┼────────────────────────┼────────────
-#>  4           │      1       2       0 │          3 
-#>  6           │      2       2       0 │          4 
-#>  8           │      0       0       0 │          0 
-#> ─────────────┼────────────────────────┼────────────
-#>  Total       │      3       4       0 │          7 
-#> 
-#> Chi-2: NA (df = 4), p = NA
-#> Cramer's V: NA
-#> Warning: 9 expected cells < 5 (100%). 5 expected cells < 1. Minimum expected = 0. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
-#> 
-#> Crosstable: cyl x gear (N) | vs x am = 0.1
-#> 
-#>  Values      │      3       4       5 │      Total 
-#> ─────────────┼────────────────────────┼────────────
-#>  4           │      0       0       1 │          1 
-#>  6           │      0       2       1 │          3 
-#>  8           │      0       0       2 │          2 
-#> ─────────────┼────────────────────────┼────────────
-#>  Total       │      0       2       4 │          6 
-#> 
-#> Chi-2: NA (df = 4), p = NA
-#> Cramer's V: NA
-#> Warning: 9 expected cells < 5 (100%). 6 expected cells < 1. Minimum expected = 0. Consider `simulate_p = TRUE` or set globally via `options(spicy.simulate_p = TRUE)`.
-#> 
-#> Crosstable: cyl x gear (N) | vs x am = 1.1
-#> 
-#>  Values      │      3       4       5 │      Total 
-#> ─────────────┼────────────────────────┼────────────
-#>  4           │      0       6       1 │          7 
-#>  6           │      0       0       0 │          0 
-#>  8           │      0       0       0 │          0 
-#> ─────────────┼────────────────────────┼────────────
-#>  Total       │      0       6       1 │          7 
-#> 
-#> Chi-2 and Cramer's V not computed: insufficient data (only one non-empty row/column).
-
-# Compute row-wise mean/sum (all values must be valid by default) or specific value
-df <- data.frame(
-  var1 = c(10, NA, 30, 40, 50),
-  var2 = c(5, NA, 15, NA, 25),
-  var3 = c(NA, 30, 20, 50, 10)
+``` r
+table_categorical(
+  sochealth,
+  select = c(smoking, physical_activity),
+  labels = c("Current smoker", "Physical activity")
 )
-df
-#>   var1 var2 var3
-#> 1   10    5   NA
-#> 2   NA   NA   30
-#> 3   30   15   20
-#> 4   40   NA   50
-#> 5   50   25   10
+#> Categorical table
+#> 
+#>  Variable               │        n          % 
+#> ────────────────────────┼─────────────────────
+#>  Current smoker         │                     
+#>    No                   │      926       78.8 
+#>    Yes                  │      249       21.2 
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Physical activity      │                     
+#>    No                   │      650       54.2 
+#>    Yes                  │      550       45.8
+```
+
+``` r
+table_categorical(
+  sochealth,
+  select = c(smoking, physical_activity),
+  by = education,
+  labels = c("Current smoker", "Physical activity")
+)
+#> Categorical table by education
+#> 
+#>  Variable          │ Lower secondary n  Lower secondary %  Upper secondary n 
+#> ───────────────────┼─────────────────────────────────────────────────────────
+#>  Current smoker    │                                                         
+#>    No              │               179               69.6                415 
+#>    Yes             │                78               30.4                112 
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Physical activity │                                                         
+#>    No              │               177               67.8                310 
+#>    Yes             │                84               32.2                229 
+#> 
+#>  Variable          │ Upper secondary %  Tertiary n  Tertiary %  Total n 
+#> ───────────────────┼────────────────────────────────────────────────────
+#>  Current smoker    │                                                    
+#>    No              │              78.7         332        84.9      926 
+#>    Yes             │              21.3          59        15.1      249 
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Physical activity │                                                    
+#>    No              │              57.5         163        40.8      650 
+#>    Yes             │              42.5         237        59.2      550 
+#> 
+#>  Variable          │ Total %       p  Cramer's V 
+#> ───────────────────┼─────────────────────────────
+#>  Current smoker    │          < .001         .14 
+#>    No              │    78.8                     
+#>    Yes             │    21.2                     
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Physical activity │          < .001         .21 
+#>    No              │    54.2                     
+#>    Yes             │    45.8
+```
+
+``` r
+table_continuous(
+  sochealth,
+  select = c(bmi, life_sat_health)
+)
+#> Descriptive statistics
+#> 
+#>  Variable                       │   M     SD    Min    Max   95% CI LL 
+#> ────────────────────────────────┼──────────────────────────────────────
+#>  Body mass index                │ 25.93  3.72  16.00  38.90    25.72   
+#>  Satisfaction with health (1-5) │ 3.55   1.25  1.00   5.00     3.48    
+#> 
+#>  Variable                       │ 95% CI UL     n 
+#> ────────────────────────────────┼─────────────────
+#>  Body mass index                │   26.14    1188 
+#>  Satisfaction with health (1-5) │   3.62     1192
+```
+
+``` r
+table_continuous(
+  sochealth,
+  select = c(bmi, life_sat_health),
+  by = education
+)
+#> Descriptive statistics
+#> 
+#>  Variable                       │ Group              M     SD    Min    Max  
+#> ────────────────────────────────┼────────────────────────────────────────────
+#>  Body mass index                │ Lower secondary  28.09  3.47  18.20  38.90 
+#>                                 │ Upper secondary  26.02  3.43  16.00  37.10 
+#>                                 │ Tertiary         24.39  3.52  16.00  33.00 
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Satisfaction with health (1-5) │ Lower secondary  2.71   1.20  1.00   5.00  
+#>                                 │ Upper secondary  3.53   1.19  1.00   5.00  
+#>                                 │ Tertiary         4.11   1.04  1.00   5.00  
+#> 
+#>  Variable                       │ Group            95% CI LL  95% CI UL    n 
+#> ────────────────────────────────┼────────────────────────────────────────────
+#>  Body mass index                │ Lower secondary    27.66      28.51    260 
+#>                                 │ Upper secondary    25.73      26.31    534 
+#>                                 │ Tertiary           24.04      24.74    394 
+#> ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+#>  Satisfaction with health (1-5) │ Lower secondary    2.57       2.86     259 
+#>                                 │ Upper secondary    3.43       3.63     534 
+#>                                 │ Tertiary           4.01       4.21     399
+```
+
+See [Categorical summary tables in
+R](https://amaltawfik.github.io/spicy/articles/table-categorical.html)
+for categorical summaries, [Continuous summary tables in
+R](https://amaltawfik.github.io/spicy/articles/table-continuous.html)
+for continuous summaries and group comparisons, and [Summary tables for
+APA-style
+reporting](https://amaltawfik.github.io/spicy/articles/summary-tables-reporting.html)
+for an overview of summary tables.
+
+### Row-wise summaries
+
+``` r
+df <- data.frame(
+  x1 = c(10, NA, 30, 40, 50),
+  x2 = c(5, NA, 15, NA, 25),
+  x3 = c(NA, 30, 20, 50, 10)
+)
+
 mean_n(df)
 #> [1]       NA       NA 21.66667       NA 28.33333
-sum_n(df)
-#> [1] NA NA 65 NA 85
-count_n(df, count = 10)
-#> [1] 1 0 0 0 1
+sum_n(df, min_valid = 2)
+#> [1] 15 NA 65 90 85
 count_n(df, special = "NA")
 #> [1] 1 2 0 1 0
-df |> mutate(count30 = count_n(count = 30))
-#>   var1 var2 var3 count30
-#> 1   10    5   NA       0
-#> 2   NA   NA   30       1
-#> 3   30   15   20       1
-#> 4   40   NA   50       0
-#> 5   50   25   10       0
+```
 
-# Extract labels from column names like "varname. label"
-# This format ("name. label") is the default in LimeSurvey CSV exports
-# when using: Export results → Export format: CSV → Headings: Question code & question text.
-# It uses ". " (dot + space) as the default separator between the question code and question text.
+See [Getting started with
+spicy](https://amaltawfik.github.io/spicy/articles/spicy.html) for a
+longer workflow using `mean_n()`, `sum_n()`, and `count_n()`.
+
+### Label extraction
+
+``` r
+# LimeSurvey-style headers: "code. label"
 df <- tibble::tibble(
   "age. Age of respondent" = c(25, 30),
-  "score. Total score. Manually computed." = c(12, 14)
+  "score. Total score" = c(12, 14)
 )
-
 out <- label_from_names(df)
-
-# View assigned labels
 labelled::var_label(out)
 #> $age
 #> [1] "Age of respondent"
 #> 
 #> $score
-#> [1] "Total score. Manually computed."
+#> [1] "Total score"
 ```
 
-> All functions can be directly used in pipelines.
+See [Explore variables and build codebooks in
+R](https://amaltawfik.github.io/spicy/articles/variable-exploration.html)
+for more on `label_from_names()`, `varlist()`, and `code_book()`.
 
 ------------------------------------------------------------------------
 
-## Why use `spicy`?
+## Learn by task
 
-- Clean, expressive output  
-- Works well with labelled survey data  
-- Handles weights, percentages, NA counts  
-- Great for exploring data and variables, teaching, or reporting
+If you are looking for a specific workflow, start with these vignettes:
+
+- [Getting started with
+  spicy](https://amaltawfik.github.io/spicy/articles/spicy.html)
+- [Explore variables and build codebooks in
+  R](https://amaltawfik.github.io/spicy/articles/variable-exploration.html)
+- [Frequency tables and cross-tabulations in
+  R](https://amaltawfik.github.io/spicy/articles/frequency-tables.html)
+- [Cramer’s V, Phi, and association measures in
+  R](https://amaltawfik.github.io/spicy/articles/association-measures.html)
+- [Categorical summary tables in
+  R](https://amaltawfik.github.io/spicy/articles/table-categorical.html)
+- [Continuous summary tables in
+  R](https://amaltawfik.github.io/spicy/articles/table-continuous.html)
+- [Summary tables for APA-style
+  reporting](https://amaltawfik.github.io/spicy/articles/summary-tables-reporting.html)
+
+Key reference pages:
+
+- [Reference for
+  `varlist()`](https://amaltawfik.github.io/spicy/reference/varlist.html)
+- [Reference for
+  `code_book()`](https://amaltawfik.github.io/spicy/reference/code_book.html)
+- [Reference for
+  `label_from_names()`](https://amaltawfik.github.io/spicy/reference/label_from_names.html)
+- [Reference for
+  `freq()`](https://amaltawfik.github.io/spicy/reference/freq.html)
+- [Reference for
+  `cross_tab()`](https://amaltawfik.github.io/spicy/reference/cross_tab.html)
+- [Reference for
+  `cramer_v()`](https://amaltawfik.github.io/spicy/reference/cramer_v.html)
+- [Reference for
+  `table_categorical()`](https://amaltawfik.github.io/spicy/reference/table_categorical.html)
+- [Reference for
+  `table_continuous()`](https://amaltawfik.github.io/spicy/reference/table_continuous.html)
+- [Reference for
+  `mean_n()`](https://amaltawfik.github.io/spicy/reference/mean_n.html)
+- [Reference for
+  `sum_n()`](https://amaltawfik.github.io/spicy/reference/sum_n.html)
+- [Reference for
+  `count_n()`](https://amaltawfik.github.io/spicy/reference/count_n.html)
 
 ------------------------------------------------------------------------
 
 ## Citation
 
-If you use `spicy` in a publication or teaching material, please cite it
-as:
+To cite spicy in a publication or teaching material:
 
-> Tawfik, A. (2025). *spicy: Tools for Data Management and Variable
-> Exploration* (Version 0.1.0) \[R package\].
-> <https://doi.org/10.5281/zenodo.15397865>
-
-You can also get the citation in R format by typing:
-
-``` r
-citation("spicy")
-```
-
-Or [download the BibTeX citation](inst/citation.bib) directly.
+- Use `citation("spicy")` to generate the current BibTeX entry.
+- Package DOI: <https://doi.org/10.32614/CRAN.package.spicy>.
+- Source citation file:
+  <https://github.com/amaltawfik/spicy/blob/main/inst/CITATION>
 
 ------------------------------------------------------------------------
 
 ## License
 
-This package is licensed under the MIT license. See [`LICENSE`](LICENSE)
-for details.
+MIT. See [`LICENSE`](LICENSE) for details.

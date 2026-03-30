@@ -9,7 +9,7 @@ copy_clipboard(
   row.names.as.col = FALSE,
   row.names = TRUE,
   col.names = TRUE,
-  message = TRUE,
+  show_message = TRUE,
   quiet = FALSE,
   ...
 )
@@ -17,15 +17,15 @@ copy_clipboard(
 \arguments{
 \item{x}{A data frame, matrix, 2D array, 3D array, table, or atomic vector to be copied.}
 
-\item{row.names.as.col}{Logical or character. If \code{FALSE} (default), row names are not added as a column. If \code{TRUE}, a column named \code{"rownames"} is prepended. If a character string is supplied, it is used as the column name for row names.}
+\item{row.names.as.col}{Logical or character. If \code{FALSE} (the default), row names are not added as a column. If \code{TRUE}, a column named \code{"rownames"} is prepended. If a character string is supplied, it is used as the column name for row names.}
 
-\item{row.names}{Logical. If \code{TRUE} (default), includes row names in the clipboard output. If \code{FALSE}, row names are omitted.}
+\item{row.names}{Logical. If \code{TRUE} (the default), includes row names in the clipboard output. If \code{FALSE}, row names are omitted.}
 
-\item{col.names}{Logical. If \code{TRUE} (default), includes column names in the clipboard output. If \code{FALSE}, column names are omitted.}
+\item{col.names}{Logical. If \code{TRUE} (the default), includes column names in the clipboard output. If \code{FALSE}, column names are omitted.}
 
-\item{message}{Logical. If \code{TRUE} (default), displays a success message after copying. If \code{FALSE}, no success message is printed.}
+\item{show_message}{Logical. If \code{TRUE} (the default), displays a success message after copying. If \code{FALSE}, no success message is printed.}
 
-\item{quiet}{Logical. If \code{TRUE}, suppresses all messages, including success, coercion notices, and warnings. If \code{FALSE} (default), messages are shown.}
+\item{quiet}{Logical. If \code{FALSE} (the default), messages are shown. If \code{TRUE}, suppresses all messages, including success, coercion notices, and warnings.}
 
 \item{...}{Additional arguments passed to \code{\link[clipr:write_clip]{clipr::write_clip()}}.}
 }
@@ -47,17 +47,17 @@ To preserve a tabular structure, you should extract a 2D slice before copying. F
 \donttest{
 if (clipr::clipr_available()) {
   # Data frame
-  copy_clipboard(mtcars)
+  copy_clipboard(sochealth)
 
   # Data frame with row names as column
-  copy_clipboard(mtcars, row.names.as.col = "car")
+  copy_clipboard(head(sochealth), row.names.as.col = "id")
 
   # Matrix
   mat <- matrix(1:6, nrow = 2)
   copy_clipboard(mat)
 
   # Table
-  tbl <- table(iris$Species)
+  tbl <- table(sochealth$education)
   copy_clipboard(tbl)
 
   # Array (3D) — flattened to character
@@ -74,7 +74,7 @@ if (clipr::clipr_available()) {
   copy_clipboard(c("apple", "banana", "cherry"))
 
   # Quiet mode (no messages shown)
-  copy_clipboard(mtcars, quiet = TRUE)
+  copy_clipboard(sochealth, quiet = TRUE)
 }
 }
 }

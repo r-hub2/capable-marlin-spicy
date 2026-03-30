@@ -42,6 +42,13 @@
 #' @export
 
 label_from_names <- function(df, sep = ". ") {
+  if (!is.data.frame(df)) {
+    stop("`df` must be a data.frame or tibble.", call. = FALSE)
+  }
+  if (!is.character(sep) || length(sep) != 1L || is.na(sep) || !nzchar(sep)) {
+    stop("`sep` must be a single non-empty character string.", call. = FALSE)
+  }
+
   split_pos <- regexpr(sep, names(df), fixed = TRUE)
 
   new_names <- ifelse(
@@ -62,10 +69,14 @@ label_from_names <- function(df, sep = ". ") {
     raw_labels
   )
 
-  df <- Map(function(col, lab) {
-    labelled::var_label(col) <- lab
-    col
-  }, df, labels)
+  df <- Map(
+    function(col, lab) {
+      labelled::var_label(col) <- lab
+      col
+    },
+    df,
+    labels
+  )
 
   tibble::as_tibble(setNames(df, new_names))
 }

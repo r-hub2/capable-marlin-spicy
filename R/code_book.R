@@ -33,40 +33,34 @@
 #' A `DT::datatable` object.
 #'
 #' @section Dependencies:
-#' Requires the following packages:
+#' Requires the following package:
 #' - **DT**
-#' - **cli**
-#' - **tools**
 #'
 #' @examples
 #' \dontrun{
-#' # Example with a built-in dataset
-#' df <- head(mtcars)
-#'
 #' # Launch the interactive codebook (opens in Viewer)
-#' code_book(df)
+#' code_book(sochealth)
 #' }
 #'
 #' @seealso
 #' [varlist()] for generating the underlying variable summaries.
 #'
 #' @export
-#' @importFrom DT datatable
-#' @importFrom cli cli_alert_danger
-code_book <- function(x,
-                      values = FALSE,
-                      include_na = FALSE,
-                      title = "Codebook",
-                      ...) {
+code_book <- function(
+  x,
+  values = FALSE,
+  include_na = FALSE,
+  title = "Codebook",
+  ...
+) {
   if (!is.data.frame(x)) {
     stop("`x` must be a data frame or tibble.", call. = FALSE)
   }
-
-  if (!exists("varlist", mode = "function")) {
-    cli::cli_alert_danger(
-      "Function `varlist()` not found. Please ensure it is available in the package."
+  if (!requireNamespace("DT", quietly = TRUE)) {
+    stop(
+      "Package 'DT' is required for code_book(). Please install it.",
+      call. = FALSE
     )
-    stop("Missing dependency: varlist().", call. = FALSE)
   }
 
   res <- tryCatch(
@@ -77,7 +71,10 @@ code_book <- function(x,
   )
 
   if (!inherits(res, "data.frame")) {
-    stop("`varlist()` did not return a data frame. Check your input.", call. = FALSE)
+    stop(
+      "`varlist()` did not return a data frame. Check your input.",
+      call. = FALSE
+    )
   }
 
   filename <- if (is.null(title)) "Codebook" else title

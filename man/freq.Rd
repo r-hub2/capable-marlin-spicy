@@ -2,7 +2,7 @@
 % Please edit documentation in R/freq.R
 \name{freq}
 \alias{freq}
-\title{Frequency Table (spicy engine)}
+\title{Frequency Table}
 \usage{
 freq(
   data,
@@ -33,7 +33,8 @@ The variable may be referenced as a bare name when it belongs to \code{data}.}
 \item{valid}{Logical. If \code{TRUE} (default), display valid percentages
 (excluding missing values).}
 
-\item{cum}{Logical. If \code{TRUE}, add cumulative percentages.}
+\item{cum}{Logical. If \code{FALSE} (the default), cumulative percentages are omitted.
+If \code{TRUE}, adds cumulative percentages.}
 
 \item{sort}{Sorting method for values:
 \itemize{
@@ -112,6 +113,10 @@ computed proportionally to the weights. The argument \code{rescale = TRUE}
 normalizes weights so their sum equals the unweighted sample size.
 }
 \examples{
+# Frequency table with labelled ordered factor
+freq(sochealth, education)
+freq(sochealth, self_rated_health, sort = "-")
+
 library(labelled)
 
 # Simple numeric vector

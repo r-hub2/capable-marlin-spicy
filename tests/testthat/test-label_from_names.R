@@ -35,3 +35,19 @@ test_that("empty or missing labels are skipped", {
       identical(labs[["y"]], "NA")
   )
 })
+
+test_that("label_from_names errors on non-data.frame input", {
+  expect_error(
+    label_from_names(1:3),
+    "`df` must be a data.frame or tibble.",
+    fixed = TRUE
+  )
+})
+
+test_that("label_from_names validates sep parameter", {
+  df <- data.frame(x = 1)
+  expect_error(label_from_names(df, sep = ""), "sep")
+  expect_error(label_from_names(df, sep = NA_character_), "sep")
+  expect_error(label_from_names(df, sep = 1), "sep")
+  expect_error(label_from_names(df, sep = c(".", ",")), "sep")
+})

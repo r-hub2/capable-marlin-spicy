@@ -1,4 +1,4 @@
-#' Frequency Table (spicy engine)
+#' Frequency Table
 #'
 #' @description
 #' Creates a frequency table for a vector or variable from a data frame, with
@@ -35,7 +35,8 @@
 #' @param digits Number of decimal digits to display for percentages (default: `1`).
 #' @param valid Logical. If `TRUE` (default), display valid percentages
 #'   (excluding missing values).
-#' @param cum Logical. If `TRUE`, add cumulative percentages.
+#' @param cum Logical. If `FALSE` (the default), cumulative percentages are omitted.
+#'   If `TRUE`, adds cumulative percentages.
 #' @param sort Sorting method for values:
 #'   * `""` - no sorting (default)
 #'   * `"+"` - increasing frequency
@@ -77,6 +78,10 @@
 #' If `styled = TRUE`, prints the formatted table to the console and returns it invisibly.
 #'
 #' @examples
+#' # Frequency table with labelled ordered factor
+#' freq(sochealth, education)
+#' freq(sochealth, self_rated_health, sort = "-")
+#'
 #' library(labelled)
 #'
 #' # Simple numeric vector
@@ -130,21 +135,48 @@
 #'
 #' @export
 
-freq <- function(data,
-                 x = NULL,
-                 weights = NULL,
-                 digits = 1,
-                 valid = TRUE,
-                 cum = FALSE,
-                 sort = "",
-                 na_val = NULL,
-                 labelled_levels = c("prefixed", "labels", "values", "p", "l", "v"),
-                 rescale = TRUE,
-                 styled = TRUE,
-                 ...) {
+freq <- function(
+  data,
+  x = NULL,
+  weights = NULL,
+  digits = 1,
+  valid = TRUE,
+  cum = FALSE,
+  sort = "",
+  na_val = NULL,
+  labelled_levels = c("prefixed", "labels", "values", "p", "l", "v"),
+  rescale = TRUE,
+  styled = TRUE,
+  ...
+) {
   labelled_levels <- match.arg(labelled_levels)
+  labelled_levels <- switch(
+    labelled_levels,
+    "p" = "prefixed",
+    "l" = "labels",
+    "v" = "values",
+    labelled_levels
+  )
+
+  if (!is.numeric(digits) || length(digits) != 1L || digits < 0) {
+    stop("`digits` must be a single non-negative number.", call. = FALSE)
+  }
+
+  if (!sort %in% c("", "+", "-", "name+", "name-")) {
+    stop(
+      "Invalid value for 'sort'. Use '+', '-', 'name+', or 'name-'.",
+      call. = FALSE
+    )
+  }
 
   is_df <- is.data.frame(data)
+  if (is_df && missing(x)) {
+    stop(
+      "When `data` is a data frame, you must supply `x` (e.g., freq(data, x)).",
+      call. = FALSE
+    )
+  }
+
   if (is_df && !missing(x)) {
     var_name <- deparse(substitute(x))
     data_name <- deparse(substitute(data))
@@ -154,13 +186,17 @@ freq <- function(data,
     data_name <- var_name
     x <- data
   } else {
+    warning(
+      "Both `data` and `x` are vectors; `data` is ignored.",
+      call. = FALSE
+    )
     var_name <- deparse(substitute(x))
     data_name <- deparse(substitute(data))
   }
 
   x_original <- x
 
-  if (!missing(weights) && !is.null(substitute(weights))) {
+  if (!missing(weights)) {
     weight_expr <- substitute(weights)
     weight_name <- deparse(weight_expr, backtick = FALSE)
     weight_name <- sub("^.*\\$", "", weight_name)
@@ -168,13 +204,17 @@ freq <- function(data,
     if (is_df && weight_name %in% names(data)) {
       weights <- data[[weight_name]]
     } else {
-      weights <- tryCatch(eval(weight_expr, envir = parent.frame()), error = function(e) NULL)
+      weights <- tryCatch(
+        eval(weight_expr, envir = parent.frame()),
+        error = function(e) NULL
+      )
     }
 
     if (is.null(weights)) {
       stop(
         paste0(
-          "The weighting variable '", weight_name,
+          "The weighting variable '",
+          weight_name,
           "' was not found either in the data frame or in the global environment."
         ),
         call. = FALSE
@@ -191,51 +231,64 @@ freq <- function(data,
     if (any(weights < 0, na.rm = TRUE)) {
       stop("`weights` must be non-negative.", call. = FALSE)
     }
-    weights[is.na(weights)] <- 0
+    if (any(!is.finite(weights[!is.na(weights)]))) {
+      stop("`weights` must contain only finite numeric values.", call. = FALSE)
+    }
+    if (any(is.na(weights))) {
+      warning("NA values in `weights` are treated as zero.", call. = FALSE)
+      weights[is.na(weights)] <- 0
+    }
 
     if (rescale) {
-      weights <- weights * length(weights) / sum(weights, na.rm = TRUE)
+      w_sum <- sum(weights, na.rm = TRUE)
+      if (!is.finite(w_sum) || w_sum <= 0) {
+        stop(
+          "`rescale = TRUE` requires a strictly positive sum of weights.",
+          call. = FALSE
+        )
+      }
+      weights <- weights * length(weights) / w_sum
     }
   }
 
   if (labelled::is.labelled(x)) {
     if (!is.null(na_val) && !is.numeric(na_val)) {
-      warning("For labelled variables, 'na_val' should match the underlying numeric value (e.g., 1), not the label.", call. = FALSE)
+      warning(
+        "For labelled variables, 'na_val' should match the underlying numeric value (e.g., 1), not the label.",
+        call. = FALSE
+      )
     }
-
-    mode_display <- switch(labelled_levels,
-      "p" = "prefixed",
-      "l" = "labels",
-      "v" = "values",
-      labelled_levels
-    )
 
     if (!is.null(na_val)) {
       x_values <- unclass(x)
       x[x_values %in% na_val] <- NA
     }
 
-    x <- labelled::to_factor(x, levels = mode_display, nolabel_to_na = FALSE)
+    x <- labelled::to_factor(x, levels = labelled_levels, nolabel_to_na = FALSE)
   } else {
     if (!is.null(na_val)) x[x %in% na_val] <- NA
   }
 
-  if (is.factor(x)) x <- droplevels(x)
-  if (!is.factor(x)) x <- factor(x)
+  if (is.factor(x)) {
+    x <- droplevels(x)
+  }
+  if (!is.factor(x)) {
+    x <- factor(x)
+  }
 
   n_total <- if (is.null(weights)) length(x) else sum(weights)
   n_missing <- if (is.null(weights)) sum(is.na(x)) else sum(weights[is.na(x)])
   n_valid <- n_total - n_missing
+
+  if (n_total == 0) {
+    stop("Total frequency is zero; cannot compute proportions.", call. = FALSE)
+  }
 
   if (is.null(weights)) {
     tab <- table(x, useNA = "ifany")
   } else {
     f <- addNA(x, ifany = TRUE)
     tab <- tapply(weights, f, sum)
-
-    if (any(is.na(names(tab)))) {
-      names(tab)[is.na(names(tab))] <- "<NA>"
-    }
   }
 
   df <- data.frame(
@@ -245,24 +298,29 @@ freq <- function(data,
   )
 
   df$prop <- df$n / n_total
-  df$valid_prop <- if (valid) ifelse(df$value == "<NA>", NA, df$n / n_valid) else NA
+  df$valid_prop <- if (valid && n_valid > 0) {
+    ifelse(is.na(df$value), NA, df$n / n_valid)
+  } else {
+    NA
+  }
 
-  # --- Tri
+  # --- Sort
   if (sort != "") {
     decreasing <- sort %in% c("-", "name-")
-    sort_col <- switch(sort,
-      "+" = "n",
-      "-" = "n",
-      "name+" = "value",
-      "name-" = "value",
-      stop("Invalid value for 'sort'. Use '+', '-', 'name+', or 'name-'.")
-    )
+    sort_col <- if (sort %in% c("+", "-")) "n" else "value"
     df <- df[order(df[[sort_col]], decreasing = decreasing), ]
   }
 
   if (cum) {
     df$cum_prop <- cumsum(df$prop)
-    df$cum_valid_prop <- if (valid) cumsum(ifelse(is.na(df$valid_prop), 0, df$valid_prop)) else NA
+    if (valid) {
+      df$cum_valid_prop <- cumsum(
+        ifelse(is.na(df$valid_prop), 0, df$valid_prop)
+      )
+      df$cum_valid_prop[is.na(df$valid_prop)] <- NA
+    } else {
+      df$cum_valid_prop <- NA
+    }
   }
 
   attr(df, "digits") <- digits
@@ -276,9 +334,13 @@ freq <- function(data,
   attr(df, "rescaled") <- rescale
   attr(df, "weight_var") <- weight_name
 
+  class(df) <- c("spicy_freq_table", "spicy_table", class(df))
+
   if (!styled) {
+    class(df) <- "data.frame"
     return(df)
   }
 
-  print.spicy_freq_table(df, ...)
+  print(df, ...)
+  invisible(df)
 }

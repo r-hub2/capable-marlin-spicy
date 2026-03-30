@@ -23,7 +23,10 @@ test_that("count_n handles multiple values with allow_coercion = FALSE", {
   df <- tibble::tibble(x = c(1, 2, 2), y = c("2", 2, 3))
 
   # Same type (character)
-  expect_equal(count_n(df, count = c("2", "3"), allow_coercion = FALSE), c(1, 1, 1))
+  expect_equal(
+    count_n(df, count = c("2", "3"), allow_coercion = FALSE),
+    c(1, 1, 1)
+  )
 
   # Same type (numeric)
   expect_equal(count_n(df, count = c(1, 2), allow_coercion = FALSE), c(1, 1, 1))
@@ -44,6 +47,20 @@ test_that("count_n handles special = NA, NaN, Inf, -Inf", {
   expect_equal(count_n(df, special = "all"), c(2, 1, 2, 2, 2))
 })
 
+test_that("count_n special works with non-numeric columns", {
+  df <- tibble::tibble(
+    x = c("a", NA, "b"),
+    y = c(1, NaN, 3),
+    z = factor(c("x", NA, "y"))
+  )
+
+  # NaN should only count in numeric column y, not crash on character/factor
+  expect_equal(count_n(df, special = "NaN"), c(0, 1, 0))
+  # NA: x=NA, y=NaN (is.na(NaN)==TRUE), z=NA → 3 NAs in row 2
+  expect_equal(count_n(df, special = "NA"), c(0, 3, 0))
+  expect_equal(count_n(df, special = "all"), c(0, 3, 0))
+})
+
 test_that("count_n handles factor variables including ignore_case", {
   df <- tibble::tibble(
     x = factor(c("a", "b", "c")), # levels: a, b, c
@@ -57,7 +74,14 @@ test_that("count_n handles factor variables including ignore_case", {
   expect_equal(count_n(df, count = "b", allow_coercion = FALSE), c(0, 0, 0))
 
   # Strict mode: with factor value having matching levels (for x)
-  expect_equal(count_n(df, count = factor("b", levels = levels(df$x)), allow_coercion = FALSE), c(0, 1, 0))
+  expect_equal(
+    count_n(
+      df,
+      count = factor("b", levels = levels(df$x)),
+      allow_coercion = FALSE
+    ),
+    c(0, 1, 0)
+  )
 
   # Using a value from the data (ensures type + levels)
   expect_equal(count_n(df, count = df$x[2], allow_coercion = FALSE), c(0, 1, 0))
@@ -67,8 +91,19 @@ test_that("count_n handles factor variables including ignore_case", {
   expect_equal(count_n(df, count = "B", ignore_case = TRUE), c(1, 2, 0))
 
   # Case-insensitive + strict: internally uses character comparison, not identical()
-  expect_equal(count_n(df, count = "b", ignore_case = TRUE, allow_coercion = FALSE), c(1, 2, 0))
-  expect_equal(count_n(df, count = factor("b", levels = levels(df$x)), ignore_case = TRUE, allow_coercion = FALSE), c(1, 2, 0))
+  expect_equal(
+    count_n(df, count = "b", ignore_case = TRUE, allow_coercion = FALSE),
+    c(1, 2, 0)
+  )
+  expect_equal(
+    count_n(
+      df,
+      count = factor("b", levels = levels(df$x)),
+      ignore_case = TRUE,
+      allow_coercion = FALSE
+    ),
+    c(1, 2, 0)
+  )
 })
 
 
@@ -90,12 +125,26 @@ test_that("count_n handles labelled variables from haven", {
 test_that("count_n handles selection and exclusion", {
   df <- tibble::tibble(x1 = "a", x2 = "b", x3 = "b", skip = "b")
   expect_equal(count_n(df, count = "b", select = starts_with("x")), 2)
-  expect_equal(count_n(df, count = "b", select = everything(), exclude = "skip"), 2)
+  expect_equal(
+    count_n(df, count = "b", select = everything(), exclude = "skip"),
+    2
+  )
 })
 
 test_that("count_n works with regex selection", {
   df <- tibble::tibble(a_1 = "a", a_2 = "b", b_1 = "b")
   expect_equal(count_n(df, count = "b", select = "^a_", regex = TRUE), 1)
+})
+
+test_that("count_n regex mode supports default select and validates pattern", {
+  df <- tibble::tibble(a = 1:2, b = c(1, 3))
+
+  expect_equal(count_n(df, count = 1, regex = TRUE), c(2, 0))
+  expect_error(
+    count_n(df, count = 1, regex = TRUE, select = c("^a", "^b")),
+    "single character pattern",
+    fixed = TRUE
+  )
 })
 
 test_that("count_n returns unnamed numeric vector", {
@@ -120,10 +169,21 @@ test_that("count_n ignores incompatible columns safely", {
   expect_equal(count_n(df, count = "b"), c(0, 1))
 })
 
+test_that("count_n verbose reports list columns", {
+  df <- tibble::tibble(x = c("a", "b"), z = list(1, 2))
+  expect_message(
+    count_n(df, count = "a", verbose = TRUE),
+    "Ignored list columns: z"
+  )
+})
+
 test_that("count_n returns 0 for empty or incompatible selection", {
   df <- tibble::tibble(x = 1:3, y = letters[1:3])
   expect_equal(count_n(df, count = "z", select = "x"), c(0, 0, 0))
-  expect_equal(count_n(df, count = "z", select = starts_with("not_here")), c(0, 0, 0))
+  expect_equal(
+    count_n(df, count = "z", select = starts_with("not_here")),
+    c(0, 0, 0)
+  )
 })
 
 test_that("count_n throws error if neither count nor special is specified", {
@@ -132,4 +192,43 @@ test_that("count_n throws error if neither count nor special is specified", {
     count_n(df),
     "You must specify either `count` or `special`"
   )
+})
+
+test_that("count_n throws error when count = NA", {
+  df <- tibble::tibble(x = c(1, NA, 3))
+  expect_error(
+    count_n(df, count = NA),
+    'Use `special = "NA"`',
+    fixed = TRUE
+  )
+})
+
+test_that("count_n throws error for invalid special values", {
+  df <- tibble::tibble(x = c(1, 2, 3))
+  expect_error(count_n(df, special = "bogus"), "Invalid `special`")
+})
+
+test_that("count_n warns and strips NA from count vector", {
+  df <- tibble::tibble(x = c(1, 2, NA), y = c(NA, 2, 3))
+  expect_warning(
+    res <- count_n(df, count = c(NA, 2)),
+    "NA values in `count` are ignored"
+  )
+  expect_equal(res, c(0, 2, 0))
+})
+
+test_that("count_n warns when both special and count are supplied", {
+  df <- tibble::tibble(x = c(1, NA, 3))
+  expect_warning(
+    res <- count_n(df, count = 1, special = "NA"),
+    "count.*ignored"
+  )
+  expect_equal(res, c(0, 1, 0))
+})
+
+test_that("count_n strict mode uses fast path for same-type atomics", {
+  df <- tibble::tibble(x = c(1, 2, 3), y = c(2, 2, 1))
+  expect_equal(count_n(df, count = 2, allow_coercion = FALSE), c(1, 2, 0))
+  df2 <- tibble::tibble(x = c("a", "b"), y = c("b", "a"))
+  expect_equal(count_n(df2, count = "b", allow_coercion = FALSE), c(1, 1))
 })

@@ -2,10 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @importFrom clipr clipr_available
-#' @importFrom clipr write_clip
-#' @importFrom collapse qTBL
-#' @importFrom dplyr everything
 #' @importFrom dplyr pick
 #' @importFrom dplyr pull
 #' @importFrom dplyr select
@@ -19,10 +15,10 @@
 #' @importFrom rlang eval_tidy
 #' @importFrom rlang inform
 #' @importFrom rlang quo_is_null
+#' @importFrom stats complete.cases
 #' @importFrom stats na.omit
 #' @importFrom stats setNames
 #' @importFrom stats xtabs
-#' @importFrom stringi stri_width
 #' @importFrom stringr str_pad
 #' @importFrom tibble as_tibble
 #' @importFrom tibble rownames_to_column
